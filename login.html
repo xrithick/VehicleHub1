@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - VehicleHub</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="nav-container">
+      <a href="index.html" class="brand-logo">
+        <span class="brand-icon">🚘</span> Vehicle<span>Hub</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="login.html" class="active">Login</a></li>
+        <li><a href="register.html">Register</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Login Main Content -->
+  <main class="main-content auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-card-header">
+        <div class="auth-logo">🔐</div>
+        <h2>Welcome Back</h2>
+        <p>Sign in to access cars, bikes, and your saved favorites</p>
+      </div>
+
+      <form id="login-form" class="auth-form">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email Address</label>
+          <input 
+            type="email" 
+            id="login-email" 
+            class="form-control" 
+            placeholder="name@example.com" 
+            required 
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="login-password">Password</label>
+          <input 
+            type="password" 
+            id="login-password" 
+            class="form-control" 
+            placeholder="••••••••" 
+            required 
+            autocomplete="current-password"
+          />
+        </div>
+
+        <button type="submit" id="btn-login" class="btn btn-primary btn-block">
+          Sign In
+        </button>
+      </form>
+
+      <!-- Quick Demo Login helper for examiner/viva testing -->
+      <div class="demo-credentials-box">
+        <strong>Academic Demo Fast-Fill:</strong>
+        Click below to auto-populate test login credentials.
+        <div style="margin-top: 0.4rem;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="fillDemoCredentials()">
+            Auto-fill Test Account
+          </button>
+        </div>
+      </div>
+
+      <div class="auth-footer">
+        Don't have an account yet? <a href="register.html"><strong>Register here</strong></a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>VehicleHub &copy; 2026 – MCA Academic Project | Powered by Supabase Authentication</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      // If user is already logged in, redirect to dashboard
+      await redirectIfLoggedIn();
+
+      // Form submission
+      const form = document.getElementById("login-form");
+      if (form) {
+        form.addEventListener("submit", handleLogin);
+      }
+    });
+  </script>
+</body>
+</html>

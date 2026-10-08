@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - VehicleHub</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="nav-container">
+      <a href="index.html" class="brand-logo">
+        <span class="brand-icon">🚘</span> Vehicle<span>Hub</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="register.html" class="active">Register</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Registration Main Content -->
+  <main class="main-content auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-card-header">
+        <div class="auth-logo">📝</div>
+        <h2>Create Account</h2>
+        <p>Register with VehicleHub to compare cars, bikes, and save favorites</p>
+      </div>
+
+      <form id="register-form" class="auth-form">
+        <div class="form-group">
+          <label class="form-label" for="reg-name">Full Name</label>
+          <input 
+            type="text" 
+            id="reg-name" 
+            class="form-control" 
+            placeholder="John Doe" 
+            required 
+            autocomplete="name"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-email">Email Address</label>
+          <input 
+            type="email" 
+            id="reg-email" 
+            class="form-control" 
+            placeholder="name@example.com" 
+            required 
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-password">Password</label>
+          <input 
+            type="password" 
+            id="reg-password" 
+            class="form-control" 
+            placeholder="At least 6 characters" 
+            minlength="6"
+            required 
+            autocomplete="new-password"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-confirm-password">Confirm Password</label>
+          <input 
+            type="password" 
+            id="reg-confirm-password" 
+            class="form-control" 
+            placeholder="Re-enter your password" 
+            minlength="6"
+            required 
+            autocomplete="new-password"
+          />
+        </div>
+
+        <button type="submit" id="btn-register" class="btn btn-primary btn-block">
+          Register
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Already have an account? <a href="login.html"><strong>Sign in here</strong></a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>VehicleHub &copy; 2026 – MCA Academic Project | Powered by Supabase Authentication</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      // If user is already logged in, redirect to dashboard
+      await redirectIfLoggedIn();
+
+      // Form submission
+      const form = document.getElementById("register-form");
+      if (form) {
+        form.addEventListener("submit", handleRegister);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compare Vehicles - VehicleHub</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="nav-container">
+      <a href="dashboard.html" class="brand-logo">
+        <span class="brand-icon">🚘</span> Vehicle<span>Hub</span>
+      </a>
+      <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Menu">☰</button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="dashboard.html">Home</a></li>
+        <li><a href="cars.html">Cars</a></li>
+        <li><a href="bikes.html">Bikes</a></li>
+        <li><a href="compare.html" class="active">Compare</a></li>
+        <li><a href="favorites.html">Favorites</a></li>
+        <li id="nav-user-info" class="nav-user"></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div style="margin-bottom: 1.5rem;">
+      <h1 style="font-size: 1.85rem; color: var(--secondary);">Vehicle Comparison ⚖️</h1>
+      <p style="color: var(--text-muted);">
+        Compare technical specifications, prices, and features side by side
+      </p>
+    </div>
+
+    <!-- Vehicle Selection Panel -->
+    <div class="compare-selector-grid">
+      <!-- Vehicle 1 Select -->
+      <div class="form-group">
+        <label class="form-label" for="select-v1">Select First Vehicle</label>
+        <select id="select-v1" class="form-control">
+          <option value="">-- Choose Vehicle 1 --</option>
+        </select>
+      </div>
+
+      <!-- VS Indicator & Swap button -->
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+        <div class="compare-vs-badge">VS</div>
+        <button type="button" id="btn-swap-vehicles" class="btn btn-secondary btn-sm" title="Swap Vehicles">
+          ⇄ Swap
+        </button>
+      </div>
+
+      <!-- Vehicle 2 Select -->
+      <div class="form-group">
+        <label class="form-label" for="select-v2">Select Second Vehicle</label>
+        <select id="select-v2" class="form-control">
+          <option value="">-- Choose Vehicle 2 --</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Comparison Results Area -->
+    <div id="comparison-results">
+      <div class="empty-state">
+        <div class="empty-state-icon">⚖️</div>
+        <h3>Select Vehicles to Compare</h3>
+        <p>Choose two vehicles from the dropdowns above to view their specifications side by side.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p><strong>VehicleHub</strong> &copy; 2026 – MCA Academic Project</p>
+      <div class="footer-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="cars.html">Cars</a>
+        <a href="bikes.html">Bikes</a>
+        <a href="compare.html">Compare</a>
+        <a href="favorites.html">Favorites</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/vehicles.js"></script>
+  <script src="js/favorites.js"></script>
+  <script src="js/compare.js"></script>
+  <script>
+    let allVehicles = [];
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Mobile Toggle
+      const toggle = document.getElementById("menu-toggle");
+      const navLinks = document.getElementById("nav-links");
+      if (toggle && navLinks) {
+        toggle.addEventListener("click", () => navLinks.classList.toggle("show"));
+      }
+
+      // Auth Guard
+      const currentUser = await requireAuth();
+      if (!currentUser) return;
+
+      // Load vehicles
+      allVehicles = await CompareService.getAllVehicles();
+
+      const select1 = document.getElementById("select-v1");
+      const select2 = document.getElementById("select-v2");
+
+      // Separate into Cars and Bikes optgroups
+      const cars = allVehicles.filter(v => v.type === "car");
+      const bikes = allVehicles.filter(v => v.type === "bike");
+
+      const populateSelect = (selectEl) => {
+        // Cars group
+        const groupCars = document.createElement("optgroup");
+        groupCars.label = "🚗 Cars";
+        cars.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c.id;
+          opt.innerText = `${c.brand} ${c.model} (${c.price})`;
+          groupCars.appendChild(opt);
+        });
+        selectEl.appendChild(groupCars);
+
+        // Bikes group
+        const groupBikes = document.createElement("optgroup");
+        groupBikes.label = "🏍️ Bikes";
+        bikes.forEach(b => {
+          const opt = document.createElement("option");
+          opt.value = b.id;
+          opt.innerText = `${b.brand} ${b.model} (${b.price})`;
+          groupBikes.appendChild(opt);
+        });
+        selectEl.appendChild(groupBikes);
+      };
+
+      populateSelect(select1);
+      populateSelect(select2);
+
+      // Check URL parameters (e.g. ?v1=car-1&v2=car-2)
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramV1 = urlParams.get("v1");
+      const paramV2 = urlParams.get("v2");
+
+      if (paramV1 && allVehicles.some(v => v.id === paramV1)) {
+        select1.value = paramV1;
+      }
+      if (paramV2 && allVehicles.some(v => v.id === paramV2)) {
+        select2.value = paramV2;
+      } else if (paramV1 && !paramV2) {
+        // If only v1 was chosen, pick a reasonable counterpart for comparison demo
+        const defaultOpposite = paramV1.startsWith("car") 
+          ? allVehicles.find(v => v.type === "car" && v.id !== paramV1)
+          : allVehicles.find(v => v.type === "bike" && v.id !== paramV1);
+        if (defaultOpposite) {
+          select2.value = defaultOpposite.id;
+        }
+      }
+
+      // Initial comparison render
+      updateComparison();
+
+      // Change listeners
+      select1.addEventListener("change", updateComparison);
+      select2.addEventListener("change", updateComparison);
+
+      // Swap button listener
+      const swapBtn = document.getElementById("btn-swap-vehicles");
+      if (swapBtn) {
+        swapBtn.addEventListener("click", () => {
+          const temp = select1.value;
+          select1.value = select2.value;
+          select2.value = temp;
+          updateComparison();
+        });
+      }
+    });
+
+    function updateComparison() {
+      const select1 = document.getElementById("select-v1");
+      const select2 = document.getElementById("select-v2");
+
+      const v1Id = select1.value;
+      const v2Id = select2.value;
+
+      const v1 = allVehicles.find(v => v.id === v1Id) || null;
+      const v2 = allVehicles.find(v => v.id === v2Id) || null;
+
+      CompareService.renderComparisonTable(v1, v2);
+
+      // Sync URL without reload
+      const newUrl = new URL(window.location.href);
+      if (v1Id) newUrl.searchParams.set("v1", v1Id); else newUrl.searchParams.delete("v1");
+      if (v2Id) newUrl.searchParams.set("v2", v2Id); else newUrl.searchParams.delete("v2");
+      window.history.replaceState({}, "", newUrl.toString());
+    }
+  </script>
+</body>
+</html>
