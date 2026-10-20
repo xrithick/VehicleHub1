@@ -13,8 +13,8 @@
 // SUPABASE CONFIGURATION
 // Replace these placeholders with your actual Supabase project credentials
 // ===================================================================
-const SUPABASE_URL = "YOUR_SUPABASE_URL";
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+const SUPABASE_URL = "https://mupmcuggivznfrfusrcf.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_rqKQrkLaLG9ugXrXGitW0Q_FBiKfgS1";
 
 // Helper to check if user has configured Supabase credentials
 function isSupabaseConfigured() {
